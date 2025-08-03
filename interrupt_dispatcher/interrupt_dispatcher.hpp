@@ -16,6 +16,8 @@ class IntDispatcher : public IcbIntDispatcher, public IcbIntAcknowledge
 
    public:
     static void init(void);
+    static void enable(const IntVectorNumber int_vec_number);
+    static void disable(const IntVectorNumber int_vec_number);
 
     static void registerIntCallback(IcbIntDispatcher* const int_call_object,
                                     const IntVectorNumber int_vec_number);

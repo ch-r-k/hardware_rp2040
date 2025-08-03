@@ -3,6 +3,7 @@
 #include <bits/c++config.h>
 #include <cstdint>
 #include <iterator>
+#include "hardware/irq.h"
 #include "hardware_abstraction/interrupt_dispatcher/icb_interrupt_ack.hpp"
 #include "hardware_abstraction/interrupt_dispatcher/icb_interrupt_disp.hpp"
 #include "hardware_rp2040/interrupt_dispatcher/nvic_types.hpp"
@@ -72,6 +73,16 @@ void IntDispatcher::TIMER_IRQ_0_Handler(void)
         // call interrupt service
         callbackObject[int_vect_number]->notifyInterruptService();
     }
+}
+
+void IntDispatcher::enable(const IntVectorNumber int_vec_number)
+{
+    irq_set_enabled(static_cast<size_t>(int_vec_number), true);
+}
+
+void IntDispatcher::disable(const IntVectorNumber int_vec_number)
+{
+    irq_set_enabled(static_cast<size_t>(int_vec_number), false);
 }
 
 }  // namespace hardware_layer
