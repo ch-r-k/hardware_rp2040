@@ -8,12 +8,8 @@
 
 namespace hardware_layer
 {
-class IntDispatcher : public IcbIntDispatcher, public IcbIntAcknowledge
+class IntDispatcher
 {
-   public:
-    void notifyInterruptService(void) override;
-    void notifyInterruptAcknowledge(void) override;
-
    public:
     static void init(void);
     static void enable(const IntVectorNumber int_vec_number);
@@ -27,6 +23,7 @@ class IntDispatcher : public IcbIntDispatcher, public IcbIntAcknowledge
                                        const IntVectorNumber int_vec_number);
     static void unregisterIntAcknowledge(const IntVectorNumber int_vec_number);
 
+   public:
     // NOLINTBEGIN
     static void TIMER_IRQ_0_Handler(void);
     static void TIMER_IRQ_1_Handler(void);
@@ -59,11 +56,11 @@ class IntDispatcher : public IcbIntDispatcher, public IcbIntAcknowledge
    private:
     static std::array<IcbIntDispatcher*,
                       static_cast<std::size_t>(IntVectorNumber::SIZE)>
-        callbackObject;
+        callbackObjectArray;
 
     static std::array<IcbIntAcknowledge*,
                       static_cast<std::size_t>(IntVectorNumber::SIZE)>
-        acknowledgeObject;
+        acknowledgeObjectArray;
 };
 
 }  // namespace hardware_layer

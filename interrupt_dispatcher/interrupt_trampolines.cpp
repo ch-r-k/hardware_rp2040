@@ -4,7 +4,7 @@ namespace hardware_layer
 {
 extern "C"
 {
-    void isr_timer_0() { IntDispatcher::TIMER_IRQ_0_Handler(); }
+    void isr_irq0() { IntDispatcher::TIMER_IRQ_0_Handler(); }
     void isr_timer_1() { IntDispatcher::TIMER_IRQ_1_Handler(); }
     void isr_timer_2() { IntDispatcher::TIMER_IRQ_2_Handler(); }
     void isr_timer_3() { IntDispatcher::TIMER_IRQ_3_Handler(); }

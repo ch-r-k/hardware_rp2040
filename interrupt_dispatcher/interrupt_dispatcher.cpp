@@ -1,6 +1,7 @@
 #include "interrupt_dispatcher.hpp"
 #include <assert.h>
 #include <bits/c++config.h>
+#include <algorithm>
 #include <cstdint>
 #include <iterator>
 #include "hardware/irq.h"
@@ -16,19 +17,16 @@ namespace hardware_layer
 // icbInterruptAcknowledge* cSTM32F7xxNVIC_Dispatcher::mptrAcknowledgeObject
 //     [InterruptVectorNumberAmount];
 
+std::array<IcbIntDispatcher*, static_cast<std::size_t>(IntVectorNumber::SIZE)>
+    IntDispatcher::callbackObjectArray = {nullptr};
+
+std::array<IcbIntAcknowledge*, static_cast<std::size_t>(IntVectorNumber::SIZE)>
+    IntDispatcher::acknowledgeObjectArray = {nullptr};
+
 void IntDispatcher::init(void)
 {
-    std::uint32_t locLoopCounter = 0;
-
-    for (auto element : callbackObject)
-    {
-        element = nullptr;
-    }
-
-    for (auto element : acknowledgeObject)
-    {
-        element = nullptr;
-    }
+    callbackObjectArray.fill(nullptr);
+    acknowledgeObjectArray.fill(nullptr);
 }
 
 void IntDispatcher::registerIntAcknowledge(
@@ -36,7 +34,7 @@ void IntDispatcher::registerIntAcknowledge(
     const IntVectorNumber int_vec_number)
 {
     assert(int_ack_object != nullptr);
-    acknowledgeObject[static_cast<std::size_t>(int_vec_number)] =
+    acknowledgeObjectArray[static_cast<std::size_t>(int_vec_number)] =
         int_ack_object;
 }
 
@@ -44,18 +42,19 @@ void IntDispatcher::registerIntCallback(IcbIntDispatcher* const int_call_object,
                                         const IntVectorNumber int_vec_number)
 {
     assert(int_call_object != nullptr);
-    callbackObject[static_cast<std::size_t>(int_vec_number)] = int_call_object;
+    callbackObjectArray[static_cast<std::size_t>(int_vec_number)] =
+        int_call_object;
 }
 
 void IntDispatcher::unregisterIntAcknowledge(
     const IntVectorNumber int_vec_number)
 {
-    acknowledgeObject[static_cast<std::size_t>(int_vec_number)] = nullptr;
+    acknowledgeObjectArray[static_cast<std::size_t>(int_vec_number)] = nullptr;
 }
 
 void IntDispatcher::unregisterIntCallback(const IntVectorNumber int_vec_number)
 {
-    callbackObject[static_cast<std::size_t>(int_vec_number)] = nullptr;
+    callbackObjectArray[static_cast<std::size_t>(int_vec_number)] = nullptr;
 }
 
 void IntDispatcher::TIMER_IRQ_0_Handler(void)
@@ -63,15 +62,15 @@ void IntDispatcher::TIMER_IRQ_0_Handler(void)
     const std::size_t int_vect_number{
         static_cast<std::size_t>(IntVectorNumber::TIMER_IRQ_0)};
 
-    if (acknowledgeObject[int_vect_number] != nullptr)
+    if (acknowledgeObjectArray[int_vect_number] != nullptr)
     {
-        acknowledgeObject[int_vect_number]->notifyInterruptAcknowledge();
+        acknowledgeObjectArray[int_vect_number]->notifyInterruptAcknowledge();
     }
 
-    if (callbackObject[int_vect_number] != nullptr)
+    if (callbackObjectArray[int_vect_number] != nullptr)
     {
         // call interrupt service
-        callbackObject[int_vect_number]->notifyInterruptService();
+        callbackObjectArray[int_vect_number]->notifyInterruptService();
     }
 }
 
