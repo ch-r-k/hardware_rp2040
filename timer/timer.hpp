@@ -19,8 +19,10 @@ class Timer : public ITimer, public IcbIntAcknowledge
     void setAlarm(std::uint32_t alarm_value) override;
 
    private:
+    IcbTimer* icb_timer{nullptr};
     void clearInterrupt();
     void notifyInterruptAcknowledge() override;
+    void setCallback(IcbTimer& icb_timer) override;
 };
 
 }  // namespace hardware_layer

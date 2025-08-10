@@ -17,11 +17,14 @@ void Timer::setAlarm(std::uint32_t alarm_value)
 
 void Timer::clearInterrupt() { timer_hw->intr = 0; }
 
+void Timer::setCallback(IcbTimer& timer) { icb_timer = &timer; }
+
 void Timer::notifyInterruptAcknowledge()
 {
     hw_clear_bits(&timer_hw->intr, 1u << 0);
     timer_hw->intr = 0;
     clearInterrupt();
+    icb_timer->notify();
 }
 
 }  // namespace hardware_layer
